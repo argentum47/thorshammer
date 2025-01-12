@@ -1,0 +1,111 @@
+#!/bin/bash
+
+# Python script to automate key tasks for the core of a weather, lightning and fire tracking mobile app
+# Import supporting software packages
+import os
+import shutil
+import subprocess
+import tempfile
+import urllib3
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from bs4 import BeautifulSoup
+import time
+
+def update_python():
+    try:
+        subprocess.run(["python", "-m", "pip", "install", "--upgrade", "pip"], check=True)
+        print("Python has been updated to the latest version.")
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while updating Python: {e}")
+
+# Remove temp files from the update process
+def remove_temp_files():
+    try:
+        temp_dir = tempfile.gettempdir()
+        for root, dirs, files in os.walk(temp_dir):
+            for file in files:
+                file_path = os.path.join(root, file)
+                os.remove(file_path)
+            for dir in dirs:
+                dir_path = os.path.join(root, dir)
+                shutil.rmtree(dir_path)
+        print("Temporary files have been removed.")
+    except Exception as e:
+        print(f"An error occurred while removing temporary files: {e}")
+
+# Install necessary Python libraries to support automated data extraction
+def install_libraries():
+    try:
+        subprocess.run(["pip", "install", "selenium", "beautifulsoup4"], check=True)
+        print("Libraries have been installed.")
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while installing libraries: {e}")
+
+# Fetch API data using GET request
+def fetch_api_data():
+    url = "https://api.github.com/users/psf/repos"
+    http = urllib3.PoolManager()
+    try:
+        response = http.request('GET', url)
+        print("Status Code:", response.status)
+        print("Response Data:", response.data)
+    except urllib3.exceptions.HTTPError as e:
+        print(f"An error occurred while fetching API data: {e}")
+
+        # Use json format to parse the data for more usable output
+import json
+...
+data = json.loads(response.data.decode('utf-8'))
+print("Response Data:", json.dumps(data, indent=4))
+
+# Post API data using POST request
+def post_api_data():
+    url = "https://httpbin.org/post"
+    http = urllib3.PoolManager()
+    try:
+        response = http.request('POST', url, fields={'winter': 'is' : 'coming'})
+        print("Status Code:", response.status)
+    except urllib3.exceptions.HTTPError as e:
+        print(f"An error occurred while posting API data: {e}")
+
+# Extract local weather data based on location
+def get_weather_data(location):
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    driver = webdriver.Chrome(options=options)
+
+    try:
+        driver.get("https://weather.com")
+        search_bar = driver.find_element(By.ID, "LocationSearch_input")
+        search_bar.send_keys(location)
+        search_bar.send_keys(Keys.RETURN)
+        time.sleep(3)
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+
+        weather_data = {
+            'location': soup.find("h1", class_="CurrentConditions--location--1Ayv3").text if soup.find("h1", class_="CurrentConditions--location--1Ayv3") else "N/A",
+            'temperature': soup.find("span", class_="CurrentConditions--tempValue--3KcTQ").text if soup.find("span", class_="CurrentConditions--tempValue--3KcTQ") else "N/A",
+            'condition': soup.find("div", class_="CurrentConditions--phraseValue--2xXSr").text if soup.find("div", class_="CurrentConditions--phraseValue--2xXSr") else "N/A",
+            'humidity': soup.find("span", class_="CurrentConditions--humidity--AlSGP").text if soup.find("span", class_="CurrentConditions--humidity--AlSGP") else "N/A",
+            'barometer': soup.find("span", class_="CurrentConditions--barometer--3OsYJ").text if soup.find("span", "CurrentConditions--barometer--3OsYJ") else "N/A",
+            'wind': soup.find("span", class_="CurrentConditions--windValue--3KxkN").text if soup.find("span", class_="CurrentConditions--windValue--3KxkN") else "N/A",
+            'precipitation': soup.find("span", class_="CurrentConditions--precipValue--RBVJT").text if soup.find("span", class_="CurrentConditions--precipValue--RBVJT") else "N/A"
+        }
+
+        return weather_data
+
+    finally:
+        driver.quit()
+
+# Collect extracted weather data
+if __name__ == "__main__":
+    update_python()
+    remove_temp_files()
+    install_libraries()
+    fetch_api_data()
+    post_api_data()
+    location = input("Enter the location: ")
+    weather_data = get_weather_data(location)
+    print(weather_data)
