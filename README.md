@@ -1,2 +1,2 @@
 # thorshammer
-mobile weather app with a Python script as a core for downloading libraries and scraping weather and lightning data.
+A mobile app for weather tracking and lightning strike data, using a Python script as a core for downloading libraries and scraping weather data.
