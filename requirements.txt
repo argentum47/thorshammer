@@ -1,0 +1,18 @@
+# Core Dependencies used in the script
+# Web Scraping & Automation
+selenium==4.39.0
+beautifulsoup4==4.14.3
+
+# Handles WebDriver installation for Selenium (still used despite Selenium Manager)
+webdriver-manager==4.0.2
+
+# HTTP Clients
+requests==2.32.5
+urllib3==2.6.2
+
+# Scheduling
+schedule==1.2.2
+
+# Utilities
+python-dotenv
+geopy
