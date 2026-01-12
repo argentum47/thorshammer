@@ -3,18 +3,15 @@
 selenium==4.39.0
 beautifulsoup4==4.14.3
 
-# Handles WebDriver installation for Selenium (still used despite Selenium Manager)
-webdriver-manager==4.0.2
-
-# HTTP Clients
+# HTTP web and API clients
+fastapi==0.109.2
+uvicorn==0.27.1
 requests==2.32.5
-urllib3==2.6.3
-# fixed CVE-2025-66418 and CVE-2025-66471
+urllib3==2.6.3  # fixed CVE-2025-66418 and CVE-2025-66471
 
-# Scheduling
+# Scheduling utilities
 schedule==1.2.2
 
-# Utilities
-python-dotenv
-
-geopy
+# Data handling utilities
+python-dotenv==1.0.1
+geopy==2.4.1
