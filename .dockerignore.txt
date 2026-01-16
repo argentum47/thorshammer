@@ -1,0 +1,15 @@
+# Ignore local environment secrets (GCP will inject these securely)
+.env
+
+# Ignore version control
+.git
+.gitignore
+
+# Ignore Python cache & virtual environments
+__pycache__
+*.pyc
+venv/
+.pytest_cache/
+
+# Ignore local logs
+*.log
