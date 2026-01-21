@@ -1,6 +1,6 @@
 # Base Image: Use a lightweight, official Python image
 # "slim" removes unnecessary tools to keep the file size small (saving money)
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 # Environment Variables
 # PYTHONDONTWRITEBYTECODE: Prevents Python from writing .pyc files to disk
@@ -29,4 +29,5 @@ USER thor
 # The Startup Command
 # Cloud Run expects the app to listen on port 8080 by default
 # "main:app" refers to "main.py" and the "app = FastAPI()" object inside it
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
