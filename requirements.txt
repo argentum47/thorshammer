@@ -1,4 +1,4 @@
-# Core Dependencies
+# Core Dependencies for thorshammer python script
 
 # Web Scraping & Automation
 selenium==4.40.0 # home page is https://pypi.org/project/selenium/
@@ -20,4 +20,5 @@ python-dotenv==1.2.1 # home page is https://pypi.org/project/python-dotenv/
 schedule==1.2.2 # home page is https://pypi.org/project/schedule/
 pydantic==2.12.5 # home page is https://pypi.org/project/pydantic/
 geopy==2.4.1 # home page is https://pypi.org/project/geopy/
+
 
