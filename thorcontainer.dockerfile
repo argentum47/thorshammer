@@ -1,10 +1,10 @@
 # Base Image: Use a lightweight, official Python image
-# "slim" removes unnecessary tools to keep the file size small (saving money)
+# "slim" removes unnecessary tools to keep the file size small and save money
 FROM python:3.13-slim
 
-# Environment Variables
+# Environment Variables to optimize for GCP Cloud Run
 # PYTHONDONTWRITEBYTECODE: Prevents Python from writing .pyc files to disk
-# PYTHONUNBUFFERED: Ensures logs appear immediately in GCP Cloud Logging
+# PYTHONUNBUFFERED: Ensures logs appear immediately in GCP Cloud logging
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
@@ -22,12 +22,12 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY . .
 
 # Security: Create a non-root user
-# Running as root is a security risk. This creates a user named "thor" and switches to it
+# Running as root is a security risk. This creates a  privileged user named "thor" and switches to it
 RUN adduser --disabled-password --gecos "" thor
 USER thor
 
 # The Startup Command
-# Cloud Run expects the app to listen on port 8080 by default
+# Cloud Run expects the app to listen on port tcp-8080 by default
 # "main:app" refers to "main.py" and the "app = FastAPI()" object inside it
-
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+
