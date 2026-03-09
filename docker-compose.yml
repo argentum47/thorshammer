@@ -1,0 +1,71 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ThorsHammer v2.1  —  docker-compose.yml
+# Single Compute Engine: one Nginx container + one FastAPI container
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Usage:
+#   docker-compose up --build -d     # start in background
+#   docker-compose logs -f api       # tail FastAPI logs
+#   docker-compose logs -f nginx     # tail Nginx logs
+#   docker-compose down              # stop everything
+#   docker-compose restart api       # redeploy API after a code change
+#
+# After starting:
+#   http://localhost/health           → API health check (via Nginx)
+#   http://localhost/docs             → FastAPI Swagger UI (via Nginx)
+#   http://localhost:8000/health      → API direct (bypasses Nginx)
+#
+# Why keep Nginx with only one app container?
+#   • Handles HTTPS/TLS — your Python code never sees raw SSL
+#   • Buffers slow clients so Uvicorn workers stay free
+#   • Rate limiting and basic DDoS protection at the edge
+#   • Serves a 502 page if the API container is restarting
+#   • Trivial to add a second API container later — one line in nginx.conf
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: "3.9"
+
+services:
+
+  # ── Nginx reverse proxy ────────────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: thorshammer-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      # Uncomment when SSL certs are ready (e.g. from Certbot or Let's Encrypt):
+      # - ./ssl/fullchain.pem:/etc/ssl/thorshammer/fullchain.pem:ro
+      # - ./ssl/privkey.pem:/etc/ssl/thorshammer/privkey.pem:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── ThorsHammer FastAPI application ────────────────────────────────────────
+  api:
+    build: .
+    image: thorshammer:v2.1
+    container_name: thorshammer-api
+    ports:
+      - "8000:8000"    # direct access for debugging; traffic normally enters via Nginx
+    env_file: .env
+    environment:
+      - ENV=production
+    volumes:
+      - ./firebase_credentials.json:/app/firebase_credentials.json:ro
+      - thorshammer_imagery:/app/drone_imagery
+      - thorshammer_backups:/app/backups
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  thorshammer_imagery:
+  thorshammer_backups:
